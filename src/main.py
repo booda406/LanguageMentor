@@ -15,6 +15,7 @@ def initialize_agents(model_name):
         "job_interview": ScenarioAgent("job_interview", model_name=model_name),
         "hotel_checkin": ScenarioAgent("hotel_checkin", model_name=model_name),
         "salary_negotiation": ScenarioAgent("salary_negotiation", model_name=model_name),
+        "daily_life": ScenarioAgent("daily_life", model_name=model_name),
     }
 
 def reload_prompts():
@@ -32,6 +33,7 @@ def reload_prompts():
             if agent.reload_prompt():
                 changes.append(scenario_name)
         
+        # 返回更新狀態和清空聊天界面
         if changes:
             return f"已重新加載以下場景的提示詞：{', '.join(changes)}"
         return "提示詞未發生變化，無需重新加載"
@@ -74,7 +76,11 @@ with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
         return gr.update()
 
     model_dropdown.change(fn=change_model, inputs=[model_dropdown], outputs=[])
-    reload_button.click(fn=reload_prompts, inputs=[], outputs=[reload_status])
+    reload_button.click(
+        fn=reload_prompts,
+        inputs=[],
+        outputs=[reload_status]
+    )
 
     with gr.Tab("场景训练"):  # 场景训练标签
         gr.Markdown("## 选择一个场景完成目标和挑战")  # 场景选择说明
@@ -85,6 +91,7 @@ with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
                 ("求职面试", "job_interview"),  # 求职面试选项
                 ("酒店入住", "hotel_checkin"),  # 酒店入住选项
                 ("薪资谈判", "salary_negotiation"),  # 薪资谈判选项
+                ("日常生活", "daily_life"),  # 日常生活場景
                 # ("租房", "renting")  # 租房选项（注释掉）
             ], 
             label="场景"  # 单选框标签
