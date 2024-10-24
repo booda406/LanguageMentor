@@ -1,3 +1,4 @@
+import os
 import json
 import random
 
@@ -13,9 +14,10 @@ from config.language_models import AVAILABLE_MODELS
 class ScenarioAgent:
     def __init__(self, scenario_name, model_name="gpt-4o-mini"):
         self.name = scenario_name
-        self.prompt_file = f"prompts/{self.name}_prompt.txt"
+        self.prompt_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'prompts', f'{scenario_name}_prompt.txt')
         self.intro_file = f"content/intro/{self.name}.json"
-        self.prompt = self.load_prompt()
+        self.prompt = ""
+        self.load_prompt()
         self.intro_messages = self.load_intro()
 
         self.model_name = model_name
@@ -24,10 +26,30 @@ class ScenarioAgent:
     
     def load_prompt(self):
         try:
-            with open(self.prompt_file, "r", encoding="utf-8") as file:
-                return file.read().strip()
+            with open(self.prompt_file, 'r', encoding='utf-8') as file:
+                new_prompt = file.read().strip()
+                if new_prompt != self.prompt:
+                    print(f"檢測到提示詞變化：\n舊：{self.prompt[:100]}...\n新：{new_prompt[:100]}...")
+                self.prompt = new_prompt
+            if not self.prompt:
+                raise ValueError("Prompt file is empty")
         except FileNotFoundError:
-            raise FileNotFoundError(f"Prompt file {self.prompt_file} not found!")
+            print(f"Error: Prompt file not found at {self.prompt_file}")
+            self.prompt = "Default conversation prompt"
+        except Exception as e:
+            print(f"Error loading prompt: {e}")
+            self.prompt = "Default conversation prompt"
+
+
+    def reload_prompt(self):
+        """重新加載提示詞並重新初始化聊天機器人"""
+        old_prompt = self.prompt
+        self.load_prompt()
+        if self.prompt != old_prompt:
+            print(f"{self.name} 提示詞已更新，重新初始化聊天機器人...")
+            self.create_chatbot()
+            return True
+        return False
 
     def load_intro(self):
         try:

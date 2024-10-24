@@ -17,6 +17,12 @@ def initialize_agents(model_name):
         "salary_negotiation": ScenarioAgent("salary_negotiation", model_name=model_name),
     }
 
+def reload_prompts():
+    conversation_agent.reload_prompt()
+    for agent in agents.values():
+        agent.reload_prompt()
+    return gr.update(value="提示词已重新加载")
+
 # 处理用户对话的函数
 def handle_conversation(user_input, chat_history):
     bot_message = conversation_agent.chat_with_history(user_input)  # 获取聊天机器人的回复
@@ -43,11 +49,15 @@ with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
         value="gpt-4o-mini"
     )
 
+    reload_button = gr.Button("重新加载提示词")
+    reload_status = gr.Textbox(label="重新加载状态", interactive=False)
+
     def change_model(model_name):
         initialize_agents(model_name)
         return gr.update()
 
     model_dropdown.change(fn=change_model, inputs=[model_dropdown], outputs=[])
+    reload_button.click(fn=reload_prompts, inputs=[], outputs=[reload_status])
 
     with gr.Tab("场景训练"):  # 场景训练标签
         gr.Markdown("## 选择一个场景完成目标和挑战")  # 场景选择说明

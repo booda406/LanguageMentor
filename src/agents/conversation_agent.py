@@ -1,3 +1,4 @@
+import os
 import json
 import random
 
@@ -17,8 +18,9 @@ class ConversationAgent:
     def __init__(self, session_id=None, model_name="gpt-4o-mini"):
         self.name = "conversation"  # 设置代理名称为 "conversation"
         self.session_id = session_id if session_id else self.name  # 如果未提供会话ID，则使用代理名称作为会话ID
-        self.prompt_file = "prompts/conversation_prompt.txt"  # 系统提示语文件路径
-        self.prompt = self.load_prompt()  # 加载系统提示语
+        self.prompt_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'prompts', 'conversation_prompt.txt')
+        self.prompt = ""
+        self.load_prompt()
 
         self.model_name = model_name
         self.create_chatbot()  # 创建聊天机器人
@@ -32,6 +34,10 @@ class ConversationAgent:
                 return file.read().strip()  # 读取文件并去除首尾空格
         except FileNotFoundError:
             raise FileNotFoundError(f"找不到提示文件 {self.prompt_file}!")
+
+    def reload_prompt(self):
+        self.load_prompt()
+        self.create_chatbot()
 
     def create_chatbot(self):
         """
