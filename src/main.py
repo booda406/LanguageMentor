@@ -2,17 +2,20 @@ import gradio as gr  # 导入 Gradio 库，用于构建用户界面
 from agents.conversation_agent import ConversationAgent  # 导入对话代理类
 from agents.scenario_agent import ScenarioAgent  # 导入场景代理类
 from utils.logger import LOG  # 导入日志记录工具
+from config.language_models import AVAILABLE_MODELS
 
 # 创建对话代理实例
-conversation_agent = ConversationAgent()
+conversation_agent = None
+agents = {}
 
-# 定义场景代理的选择与调用
-agents = {
-    "job_interview": ScenarioAgent("job_interview"),  # 求职面试场景代理
-    "hotel_checkin": ScenarioAgent("hotel_checkin"),  # 酒店入住场景代理
-    # "salary_negotiation": ScenarioAgent("salary_negotiation"),  # 薪资谈判场景代理（注释掉）
-    # "renting": ScenarioAgent("renting")  # 租房场景代理（注释掉）
-}
+def initialize_agents(model_name):
+    global conversation_agent, agents
+    conversation_agent = ConversationAgent(model_name=model_name)
+    agents = {
+        "job_interview": ScenarioAgent("job_interview", model_name=model_name),
+        "hotel_checkin": ScenarioAgent("hotel_checkin", model_name=model_name),
+        "salary_negotiation": ScenarioAgent("salary_negotiation", model_name=model_name),
+    }
 
 # 处理用户对话的函数
 def handle_conversation(user_input, chat_history):
@@ -34,6 +37,18 @@ def handle_scenario(user_input, chat_history, scenario):
 
 # Gradio 界面构建
 with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
+    model_dropdown = gr.Dropdown(
+        choices=list(AVAILABLE_MODELS.keys()),
+        label="选择语言模型",
+        value="gpt-4o-mini"
+    )
+
+    def change_model(model_name):
+        initialize_agents(model_name)
+        return gr.update()
+
+    model_dropdown.change(fn=change_model, inputs=[model_dropdown], outputs=[])
+
     with gr.Tab("场景训练"):  # 场景训练标签
         gr.Markdown("## 选择一个场景完成目标和挑战")  # 场景选择说明
 
@@ -42,7 +57,7 @@ with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
             choices=[
                 ("求职面试", "job_interview"),  # 求职面试选项
                 ("酒店入住", "hotel_checkin"),  # 酒店入住选项
-                # ("薪资谈判", "salary_negotiation"),  # 薪资谈判选项（注释掉）
+                ("薪资谈判", "salary_negotiation"),  # 薪资谈判选项
                 # ("租房", "renting")  # 租房选项（注释掉）
             ], 
             label="场景"  # 单选框标签
@@ -50,7 +65,7 @@ with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
 
         scenario_intro = gr.Markdown()  # 场景介绍文本组件
         scenario_chatbot = gr.Chatbot(
-            placeholder="<strong>你的英语私教 DjangoPeng</strong><br><br>选择场景后开始对话吧！",  # 聊天机器人的占位符
+            placeholder="<strong>你的英语私教 StevenTseng</strong><br><br>选择场景后开始对话吧！",  # 聊天机器人的占位符
             height=600,  # 聊天窗口高度
         )
 
@@ -84,7 +99,7 @@ with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
     with gr.Tab("对话练习"):  # 对话练习标签
         gr.Markdown("## 练习英语对话 ")  # 对话练习说明
         conversation_chatbot = gr.Chatbot(
-            placeholder="<strong>你的英语私教 DjangoPeng</strong><br><br>想和我聊什么话题都可以，记得用英语哦！",  # 聊天机器人的占位符
+            placeholder="<strong>你的英语私教 StevenTseng</strong><br><br>想和我聊什么话题都可以，记得用英语哦！",  # 聊天机器人的占位符
             height=800,  # 聊天窗口高度
         )
 
@@ -96,6 +111,9 @@ with gr.Blocks(title="LanguageMentor 英语私教") as language_mentor_app:
             clear_btn="清除历史记录",  # 清除历史记录按钮文本
             submit_btn="发送",  # 发送按钮文本
         )
+
+# 初始化默认模型
+initialize_agents("gpt-4o-mini")
 
 # 启动应用
 if __name__ == "__main__":
