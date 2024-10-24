@@ -18,10 +18,27 @@ def initialize_agents(model_name):
     }
 
 def reload_prompts():
-    conversation_agent.reload_prompt()
-    for agent in agents.values():
-        agent.reload_prompt()
-    return gr.update(value="提示词已重新加载")
+    """重新加載所有提示詞"""
+    global conversation_agent, agents
+    try:
+        changes = []
+        
+        # 重新加載會話代理
+        if conversation_agent.reload_prompt():
+            changes.append("一般會話")
+        
+        # 重新加載場景代理
+        for scenario_name, agent in agents.items():
+            if agent.reload_prompt():
+                changes.append(scenario_name)
+        
+        if changes:
+            return f"已重新加載以下場景的提示詞：{', '.join(changes)}"
+        return "提示詞未發生變化，無需重新加載"
+    except Exception as e:
+        print(f"重新加載提示詞時發生錯誤: {str(e)}")
+        return f"重新加載提示詞時發生錯誤: {str(e)}"
+
 
 # 处理用户对话的函数
 def handle_conversation(user_input, chat_history):

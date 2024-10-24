@@ -26,18 +26,31 @@ class ConversationAgent:
         self.create_chatbot()  # 创建聊天机器人
 
     def load_prompt(self):
-        """
-        加载系统提示语。
-        """
         try:
-            with open(self.prompt_file, "r", encoding="utf-8") as file:
-                return file.read().strip()  # 读取文件并去除首尾空格
+            with open(self.prompt_file, 'r', encoding='utf-8') as file:
+                new_prompt = file.read().strip()
+                if new_prompt != self.prompt:
+                    print(f"檢測到提示詞變化：\n舊：{self.prompt[:100]}...\n新：{new_prompt[:100]}...")
+                self.prompt = new_prompt
+            if not self.prompt:
+                raise ValueError("Prompt file is empty")
         except FileNotFoundError:
-            raise FileNotFoundError(f"找不到提示文件 {self.prompt_file}!")
+            print(f"Error: Prompt file not found at {self.prompt_file}")
+            self.prompt = "Default conversation prompt"
+        except Exception as e:
+            print(f"Error loading prompt: {e}")
+            self.prompt = "Default conversation prompt"
+
 
     def reload_prompt(self):
+        """重新加載提示詞並重新初始化聊天機器人"""
+        old_prompt = self.prompt
         self.load_prompt()
-        self.create_chatbot()
+        if self.prompt != old_prompt:  # 只有當提示詞真的改變時才重新創建聊天機器人
+            print("提示詞已更新，重新初始化聊天機器人...")
+            self.create_chatbot()
+            return True
+        return False
 
     def create_chatbot(self):
         """
