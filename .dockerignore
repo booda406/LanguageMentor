@@ -9,3 +9,4 @@ ENV/
 *.log
 coverage.xml
 docker-compose.override.yml
+.lm_env/
