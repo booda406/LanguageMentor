@@ -1,8 +1,8 @@
 # tabs/scenario_tab.py
 
 import gradio as gr
-from agents.scenario_agent import ScenarioAgent
-from utils.logger import LOG
+from ..agents.scenario_agent import ScenarioAgent
+from ..utils.logger import LOG
 
 # 初始化场景代理
 agents = {

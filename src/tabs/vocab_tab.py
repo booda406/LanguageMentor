@@ -1,8 +1,8 @@
 # tabs/vocab_tab.py
 
 import gradio as gr
-from agents.vocab_agent import VocabAgent
-from utils.logger import LOG
+from ..agents.vocab_agent import VocabAgent
+from ..utils.logger import LOG
 
 # 初始化词汇代理，负责管理词汇学习会话
 vocab_agent = VocabAgent()

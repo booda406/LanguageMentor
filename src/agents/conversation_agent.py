@@ -2,7 +2,7 @@ from langchain_core.messages import AIMessage  # 导入消息类
 
 from .session_history import get_session_history  # 导入会话历史相关方法
 from .agent_base import AgentBase
-from utils.logger import LOG
+from ..utils.logger import LOG
 
 class ConversationAgent(AgentBase):
     """

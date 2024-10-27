@@ -7,7 +7,7 @@ from langchain_core.messages import HumanMessage  # 导入消息类
 from langchain_core.runnables.history import RunnableWithMessageHistory  # 导入带有消息历史的可运行类
 
 from .session_history import get_session_history  # 导入会话历史相关方法
-from utils.logger import LOG  # 导入日志工具
+from ..utils.logger import LOG  # 导入日志工具
 
 class AgentBase(ABC):
     """

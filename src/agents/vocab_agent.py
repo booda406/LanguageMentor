@@ -2,7 +2,7 @@ from langchain_core.messages import AIMessage  # 导入 AI 消息类
 
 from .session_history import get_session_history  # 导入用于处理会话历史的方法
 from .agent_base import AgentBase  # 导入基础代理类
-from utils.logger import LOG  # 导入日志记录模块
+from ..utils.logger import LOG  # 导入日志记录模块
 
 class VocabAgent(AgentBase):
     """

@@ -1,8 +1,8 @@
 # tabs/conversation_tab.py
 
 import gradio as gr
-from agents.conversation_agent import ConversationAgent
-from utils.logger import LOG
+from ..agents.conversation_agent import ConversationAgent
+from ..utils.logger import LOG
 
 # 初始化对话代理
 conversation_agent = ConversationAgent()
